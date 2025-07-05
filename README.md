@@ -1,62 +1,79 @@
-# Multilingual Translator with Semantic Search and BLEU Evaluation
+# Multilingual Translator + Semantic Search (Enhanced)
 
-This project is an end-to-end multilingual NLP application that:
-- Automatically detects the input language
-- Translates text using Meta’s NLLB-200 model
-- Retrieves culturally relevant insights using semantic search on a Sanskrit corpus
-- Evaluates translation quality using BLEU scoring
+This project is a smart multilingual translator web app that offers:
+ Automatic **language detection**
+ High-quality **translation** between multiple Indian and foreign languages
+ **Semantic search** to find similar Sanskrit-based concepts
+ Optional **BLEU score** evaluation for comparing translations
+ A downloadable `.txt` **report** summarizing the output
+ Input length handling to avoid translation errors
 
-The app is built using **Streamlit** and deployed on **Hugging Face Spaces** for public use.
+Developed using **Hugging Face Transformers**, **Sentence Transformers**, **FAISS**, and **Gradio** — and deployable to **Hugging Face Spaces**.
+## Input Limit Notice
+  **Please enter only up to 3 lines of text or 2000 characters maximum.**  
+> If the input is too long, the app will show an error and skip translation.
 
-# Features
+##  Live Demo
 
--  **Language Detection** — XLM-RoBERTa-based classifier
--  **Translation** — NLLB-200 (Distilled, 600M) multilingual model
--  **Semantic Search** — FAISS + SBERT with curated Sanskrit corpus
--  **BLEU Evaluation** — Compare machine output with human reference
--  **Similarity Plot** — Matplotlib-based visualization
--  **Streamlit UI** — Hosted on Hugging Face Spaces
+[Click here to view the live app on Hugging Face Spaces](https://huggingface.co/spaces/jeevitha-app/Multilingual-translator)  
+ [GitHub Repository](https://github.com/Jeevitha0204/Multilingual_translator)
 
-# Tech Stack
 
-- Python 3.x  
-- Streamlit  
-- HuggingFace Transformers  
-- SentenceTransformers  
-- FAISS  
-- SacreBLEU  
-- Matplotlib  
+## Features
 
-# Installation & Setup
+Feature with Description 
 
-```bash
-# Clone the repo
-git clone https://github.com/Jeevitha0204/Multilingual-Translator.git
-cd Multilingual-Translator
+Language Detection - Auto-identifies input language using `xlm-roberta-base-language-detection` 
+Translation - Uses Facebook's `NLLB-200` model for multilingual translation 
+Semantic Search - Finds similar Sanskrit concepts using Sentence Transformers + FAISS 
+BLEU Score - Optional metric comparing translation vs. human reference 
+Semantic Plot - Horizontal bar chart for top 3 similarity scores 
+Download Report - Creates a `.txt` summary file (language, translation, scores) 
+Error Handling - Empty input / long input shows friendly messages 
 
-# Install dependencies
-pip install -r requirements.txt
 
-# Run the app
-streamlit run app.py
+## Supported Languages
 
-Live Demo
- GitHub Repo: https://github.com/Jeevitha0204/Multilingual-Translator
+| Code      | Language   |
+|-----------|------------|
+| eng_Latn  | English    |
+| hin_Deva  | Hindi      |
+| tam_Taml  | Tamil      |
+| tel_Telu  | Telugu     |
+| san_Deva  | Sanskrit   |
+| fra_Latn  | French     |
+| spa_Latn  | Spanish    |
+| deu_Latn  | German     |
+| jpn_Jpan  | Japanese   |
+| zho_Hans  | Chinese    |
+| arb_Arab  | Arabic     |
 
- Live App on Hugging Face Spaces: https://huggingface.co/spaces/jeevitha-app/Multilingual-Translator-App
 
-How It Works
-Paste your input text (e.g., in Hindi, French, Tamil, etc.)
+# 📄 Downloadable Report
 
-Select a target language code (e.g., eng_Latn, fra_Latn)
+The app generates a downloadable `.txt` file with:
 
-Optionally provide a human reference translation
+- Detected source language
+- Translated output
+- Semantic matches (with similarity scores)
+- BLEU score if human reference is given
 
-View:
+ Future Enhancements
+ 
+*Speech-to-text input support
+*Text-to-speech audio output
+* OCR: Translate text from images
+* Add more Indian languages and support for transliteration
 
- Detected language
- Translated text
- Top 3 semantic matches from the Sanskrit corpus
- BLEU score
+Author
+Jeevitha Meenakshisundaram
+MSc Data Science | Sastra University
 
-Similarity score visualization
+
+License
+This project is licensed under the MIT License.
+
+
+
+
+
