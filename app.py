@@ -1,4 +1,4 @@
-# app.py
+
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, AutoModelForSeq2SeqLM
 from sentence_transformers import SentenceTransformer
@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import gradio as gr
 from sacrebleu import corpus_bleu
 import os
+import tempfile
+
 
 # Load Models
 lang_detect_model = AutoModelForSequenceClassification.from_pretrained("papluca/xlm-roberta-base-language-detection")
@@ -75,18 +77,32 @@ def search_semantic(query, top_k=3):
     query_embedding = embed_model.encode([query])
     distances, indices = index.search(query_embedding, top_k)
     return [(corpus[i], float(distances[0][idx])) for idx, i in enumerate(indices[0])]
+    
+# Create downloadable output file
+def save_output_to_file(detected_lang, translated, sem_results, bleu_score):
+    with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix=".txt") as f:
+        f.write(f"Detected Language: {detected_lang}\n")
+        f.write(f"Translated Text: {translated}\n\n")
+        f.write("Top Semantic Matches:\n")
+        for i, (text, score) in enumerate(sem_results):
+            f.write(f"{i+1}. {text} (Score: {score:.2f})\n")
+        if bleu_score:
+            f.write(f"\nBLEU Score: {bleu_score}")
+        return f.name
 
-# Main Pipeline
 def full_pipeline(user_input_text, target_lang_code, human_ref=""):
     if not user_input_text.strip():
-        return "Empty input", "", [], "", ""
+        return "Empty input", "", [], "", "", None
+
+    if len(user_input_text) > 2048:
+        return " Input too long", "Please enter shorter text (under 2000 characters).", [], "", "", None
 
     detected_lang = detect_language(user_input_text)
     src_nllb = xlm_to_nllb.get(detected_lang, "eng_Latn")
 
     translated = translate(user_input_text, src_nllb, target_lang_code)
     if not translated:
-        return detected_lang, "Translation failed", [], "", ""
+        return detected_lang, " Translation failed", [], "", "", None
 
     sem_results = search_semantic(translated)
     result_list = [f"{i+1}. {txt} (Score: {score:.2f})" for i, (txt, score) in enumerate(sem_results)]
@@ -111,7 +127,9 @@ def full_pipeline(user_input_text, target_lang_code, human_ref=""):
         bleu = corpus_bleu([translated], [[human_ref]])
         bleu_score = f"{bleu.score:.2f}"
 
-    return detected_lang, translated, "\n".join(result_list), plot_path, bleu_score
+    download_file_path = save_output_to_file(detected_lang, translated, sem_results, bleu_score)
+    return detected_lang, translated, "\n".join(result_list), plot_path, bleu_score, download_file_path
+
 
 # Gradio Interface
 gr.Interface(
@@ -126,8 +144,9 @@ gr.Interface(
         gr.Textbox(label="Translated Text"),
         gr.Textbox(label="Top Semantic Matches"),
         gr.Image(label="Semantic Similarity Plot"),
-        gr.Textbox(label="BLEU Score")
+        gr.Textbox(label="BLEU Score"),
+        gr.File(label="Download Translation Report")  # NEW OUTPUT
     ],
-    title="Multilingual Translator + Semantic Search",
-    description="Detects language → Translates → Finds related Sanskrit concepts → BLEU optional."
+    title=" Multilingual Translator + Semantic Search",
+    description="Detects language → Translates → Finds related Sanskrit concepts → BLEU optional → Downloadable report."
 ).launch()
