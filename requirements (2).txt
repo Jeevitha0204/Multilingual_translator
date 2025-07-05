@@ -5,3 +5,4 @@ gradio
 faiss-cpu
 sacrebleu
 matplotlib
+numpy
